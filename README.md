@@ -4,7 +4,9 @@
 
 ### Dataset
 
-Download all the data from [this link](https://drive.google.com/drive/folders/1b_3bWUcOWChSGHcwwseuXdejWwk_xDqo?usp=sharing)
+view the bug list in [Dataset](Dataset)
+
+or Download all the data from [this link](https://drive.google.com/drive/folders/1b_3bWUcOWChSGHcwwseuXdejWwk_xDqo?usp=sharing)
 
 ### Tool
 
@@ -94,4 +96,3 @@ This file records the execution sequence of RegDroid, which can be read and repl
 #### i_trace.html
 
 This file records the sequence of screenshots after each step, which is arranged horizontally. The events executed at each step are marked on the screenshot. After opening the file in the browser, there is a drag bar at the bottom, which can drag horizontally to view the whole sequence. When the error is captured, the screenshot is marked with a red frame. When the two interfaces are different, the screen capture is marked with a yellow frame.
-
