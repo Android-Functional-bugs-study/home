@@ -6,7 +6,7 @@
 
 view the bug list in [Dataset](Dataset)
 
-or Download all the data from [this link](https://drive.google.com/drive/folders/1b_3bWUcOWChSGHcwwseuXdejWwk_xDqo?usp=sharing)
+or Download all the data from [this link](https://1drv.ms/u/s!AqF-Z1v5QCuxgir6NaCpCtUC7ouX?e=PD1jVs)
 
 ### Tool
 
@@ -48,7 +48,7 @@ emulator -avd Android8.0 -read-only -port 5556
 If you have downloaded our project and configured the environment, you only need to enter ``download_path/tool/RegDroid`` to execute our sample app with the following command:
 
 ```
-python3 start.py -app_path ./App/AmazeFileManager-3.7.1.apk -emulator_path  path_to_emulator -app_path ./App/AmazeFileManager-3.7.2.apk  -append_device emulator-5554 -append_device emulator-5556 -output  3.7.1-3.7.2  -testcase_count 1 -event_num 10
+python3 start.py -app_path ./App/AmazeFileManager-3.7.1.apk -emulator_path  path_to_emulator -app_path ./App/AmazeFileManager-3.7.2.apk  -append_device emulator-5554 -append_device emulator-5556 -output  3.7.1-3.7.2  -testcase_count 1 -event_num 20
 ```
 
 Here,
