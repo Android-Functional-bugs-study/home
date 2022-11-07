@@ -1,16 +1,16 @@
-# Functional bug study in Android apps
+# An Empirical Study of Functional Bugs in Android Apps
 
-## Getting Started
-
-### Dataset
+## Dataset
 
 view the bug list in [Dataset](Dataset)
-
 or Download all the data from [this link](https://1drv.ms/u/s!AqF-Z1v5QCuxgir6NaCpCtUC7ouX?e=PD1jVs)
 
-### Tool
 
-### Download
+## RegDroid
+
+### Getting Started
+
+#### Download
 
 ```
 git clone https://github.com/Android-Functional-bugs-study/home.git
@@ -65,9 +65,9 @@ Here,
 
 ``-event_num`` The number of events in per round of test.
 
-## Detailed Description
+#### Detailed Description
 
-### Description of Output Files
+##### Description of Output Files
 
 * The output path of the tool is in ``/Too/Output/``.
 * The result files of each app are classified and stored in ``/Too/Output/``.
@@ -77,22 +77,22 @@ Here,
 * Open the ``screen`` folder, and you can see the screenshot of each step and the corresponding interface layout information file.
 * Next, I will introduce the content and use of each file.
 
-#### error_realtime.txt
+###### error_realtime.txt
 
 This file records the sequences that trigger the defects, which start with ``Start::x::run_count::y`` (x means the x-th error and Y means the error was captured during the y-th round of execution), and end with ``End::``
 
-#### wrong_realtime.txt
+###### wrong_realtime.txt
 
 This file records the sequences that trigger the suspected defects.
 
-#### read_trace.txt
+###### read_trace.txt
 
 This file records the execution sequence of RegDroid, which is easy for RegDroid users to read.
 
-#### trace.txt
+###### trace.txt
 
 This file records the execution sequence of RegDroid, which can be read and replayed by RegDroid.
 
-#### i_trace.html
+###### i_trace.html
 
 This file records the sequence of screenshots after each step, which is arranged horizontally. The events executed at each step are marked on the screenshot. After opening the file in the browser, there is a drag bar at the bottom, which can drag horizontally to view the whole sequence. When the error is captured, the screenshot is marked with a red frame. When the two interfaces are different, the screen capture is marked with a yellow frame.
