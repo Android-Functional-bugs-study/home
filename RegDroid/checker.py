@@ -1,14 +1,11 @@
-import json
-import logging
-import subprocess
+
 import time
-from device import Device
-from app import App
-import uiautomator2 as u2
-import time
+import os
 import re
+
 from injector import Injector
 from utils import Utils
+
 
 class Checker(object):
     
@@ -17,7 +14,7 @@ class Checker(object):
         self.timeout = timeout
         self.app = app
         self.devices = devices
-        self.guest_devices=self.devices[1:len(self.devices)]
+        self.guest_devices = self.devices[1:]
         self.emulator_path = emulator_path
         self.android_system = android_system
         self.root_path = root_path
@@ -43,55 +40,56 @@ class Checker(object):
         self.utils = Utils(devices=devices)
     
     def check_time(self,path):
-        fw = open(path+"/time_bug.txt",'w',encoding='utf-8')
-        time_bugs=[]
-        import os
-        for root, dirs, files in os.walk(path, topdown=False):
-            for name in files:
-                if "5556" in name and "xml" in name:
-                    xml_path=os.path.join(root, name)
-                    f = open(xml_path,'r',encoding='utf-8')
-                    lines=f.readlines()
-                    f.close()
-                    for line in lines:
-                        if "text=\"" in line and self.app.package_name in line:
-                            text = line[line.find("text=\"")+6:len(line)]
-                            text = text[0:text.find("\"")]
-                            pattern = re.search("^(1[0-2]|0?[1-9]|0):([0-5]?[0-9])$", text)
-                            if pattern != None and text not in time_bugs:
-                                time_bugs.append(text)
-                                fw.write(xml_path+'\n')
-                                fw.write(text+'\n\n')
-                                fw.flush()
-        fw.close()
+        with open(f"{path}/time_bug.txt", 'w', encoding='utf-8') as fw:
+            time_bugs=[]
+            for root, dirs, files in os.walk(path, topdown=False):
+                for name in files:
+                    if not ("5556" in name and "xml" in name):
+                        continue
 
-        
+                    xml_path = os.path.join(root, name)
+                    with open(xml_path,'r',encoding='utf-8') as f:
+                        lines = f.readlines()
+                    
+                    for line in lines:
+                        if not("text=\"" in line and self.app.package_name in line):
+                            continue
+
+                        text = line[line.find("text=\"")+6:]
+                        text = text[:text.find("\"")]
+                        pattern = re.search("^(1[0-2]|0?[1-9]|0):([0-5]?[0-9])$", text)
+                        if pattern is not None and text not in time_bugs:
+                            time_bugs.append(text)
+                            fw.write(xml_path+'\n')
+                            fw.write(text+'\n\n')
+                            fw.flush()
+
     def check_language(self,path):
-        fw = open(path+"/language_bug.txt",'w',encoding='utf-8')
-        language_bugs=[]
-        import os
-        for root, dirs, files in os.walk(path, topdown=False):
-            for name in files:
-                if "5556" in name and "xml" in name:
-                    xml_path=os.path.join(root, name)
-                    f = open(xml_path,'r',encoding='utf-8')
-                    lines=f.readlines()
-                    f.close()
+        with open(f"{path}/language_bug.txt", 'w', encoding='utf-8') as fw:
+            language_bugs = []
+            for root, dirs, files in os.walk(path, topdown=False):
+                for name in files:
+                    if not ("5556" in name and "xml" in name):
+                        continue
+
+                    xml_path = os.path.join(root, name)
+                    with open(xml_path,'r',encoding='utf-8') as f:
+                        lines = f.readlines()
+                    
                     for line in lines:
-                        if "text=\"" in line and self.app.package_name in line:
-                            text = line[line.find("text=\"")+6:len(line)]
-                            text = text[0:text.find("\"")]
-                            import langid
-                            language_classify=langid.classify(text)
-                            if "en" in language_classify[0] and text!="" and text not in language_bugs:
-                                print(text)
-                                language_bugs.append(text)
-                                fw.write(xml_path+'\n')
-                                fw.write(text+'\n\n')
-                                fw.flush()
-        fw.close()
+                        if not ("text=\"" in line and self.app.package_name in line):
+                            continue
 
-
+                        text = line[line.find("text=\"")+6:]
+                        text = text[:text.find("\"")]
+                        import langid
+                        language_classify = langid.classify(text)
+                        if "en" in language_classify[0] and text != "" and text not in language_bugs:
+                            print(text)
+                            language_bugs.append(text)
+                            fw.write(xml_path+'\n')
+                            fw.write(text+'\n\n')
+                            fw.flush()
 
     def check_keyboard(self):
         for device in self.devices:
@@ -109,10 +107,7 @@ class Checker(object):
     def check_foreground(self):
         packagelist=[self.app.package_name,"com.google.android.permissioncontroller","com.android.packageinstaller","com.android.permissioncontroller"]
         lines = self.devices[0].use.dump_hierarchy()
-        for package in packagelist:
-            if package in lines:
-                return True
-        return False
+        return any(package in lines for package in packagelist)
     
     def check_start(self,times,strategy):
         try:
@@ -131,7 +126,7 @@ class Checker(object):
             else:
                 print("Other start")
                 time.sleep(self.rest_interval*2)
-        except:
+        except Exception:
             print("")
 
     def check_setting_request(self):
@@ -265,29 +260,32 @@ class Checker(object):
                 Flag = True
         return Flag
     
-    def containsAny(self,seq, aset):
-        return True if any(i in seq for i in aset) else False
+    def containsAny(self, seq, aset):
+        return any((i in seq for i in aset))
 
     def check_loading(self):
-        wait_time=0
+        wait_time = 0
         for device in self.devices:
-            if device.use(className="android.widget.ProgressBar").count>0 and wait_time < self.rest_interval*5:
-                time.sleep(self.rest_interval*5)
-                wait_time=wait_time+self.rest_interval*5
+            if (device.use(className="android.widget.ProgressBar").count > 0 and 
+                wait_time < self.rest_interval * 5):
+                time.sleep(self.rest_interval * 5)
+                wait_time = wait_time + self.rest_interval * 5
                 print("wait load")
-            elif wait_time > self.rest_interval*20 or wait_time == self.rest_interval*20:
+            elif wait_time > self.rest_interval * 20 or wait_time == self.rest_interval * 20:
                 print("so long wait")
         return wait_time
     
     def check_crash(self):
         for device in self.devices:
             device.last_crash_logcat = device.crash_logcat
-            f_crash = open(self.root_path+"/"+device.device_serial+"_logcat.txt",'r',encoding='utf-8')
-            device.crash_logcat=f_crash.read()
+            f_crash = open(
+                f"{self.root_path}/{device.device_serial}_logcat.txt",
+                'r',
+                encoding='utf-8',
+            )
+            device.crash_logcat = f_crash.read()
             if device.use(text="Close app").count>0:
                 device.use(text="Close app").click()
-            if device.crash_logcat!=device.last_crash_logcat:
-                crash_info = device.crash_logcat[len(device.last_crash_logcat):len(device.crash_logcat)-1]+'\n'
-                return crash_info
+            if device.crash_logcat != device.last_crash_logcat:
+                return device.crash_logcat[len(device.last_crash_logcat):-1] + '\n'
         return None
-        

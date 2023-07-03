@@ -1,57 +1,59 @@
+
 import logging
 import os
 import sys
-import pkg_resources
-import shutil
+import time
+import traceback
 from threading import Timer
+
 from device import Device
 from app import App
 from executor import Executor
-import uiautomator2 as u2
-import time
 from utils import Utils
-import traceback
+
+
 class RegDroid(object):
     instance = None
+
     def __init__(self,
-                devices_serial,
-                pro_click=100,
-                pro_longclick=10,
-                pro_scroll=10,
-                pro_edit=10,
-                pro_naturalscreen=5,
-                pro_leftscreen=10,
-                pro_back=5,
-                pro_home=5,
-                pro_splitscreen=0,
-                app_path=None,
-                is_emulator=True,
-                choice=0,
-                emulator_path=None,
-                android_system=None,
-                root_path=None,
-                resource_path=None,
-                strategy_list=None,
-                testcase_count=None,
-                start_testcase_count=None,
-                event_num=None,
-                timeout=None,
-                policy_name="random",
-                setting_random_denominator=5,
-                serial_or_parallel=None,
-                app_name=None,
-                emulator_name=None,
-                is_login_app=None,
-                rest_interval=None,
-                trace_path=None):
-        
+                 devices_serial,
+                 pro_click=100,
+                 pro_longclick=10,
+                 pro_scroll=10,
+                 pro_edit=10,
+                 pro_naturalscreen=5,
+                 pro_leftscreen=10,
+                 pro_back=5,
+                 pro_home=5,
+                 pro_splitscreen=0,
+                 app_path=None,
+                 is_emulator=True,
+                 choice=0,
+                 emulator_path=None,
+                 android_system=None,
+                 root_path=None,
+                 resource_path=None,
+                 strategy_list=None,
+                 testcase_count=None,
+                 start_testcase_count=None,
+                 event_num=None,
+                 timeout=None,
+                 policy_name="random",
+                 setting_random_denominator=5,
+                 serial_or_parallel=None,
+                 app_name=None,
+                 emulator_name=None,
+                 is_login_app=None,
+                 rest_interval=None,
+                 trace_path=None):
+
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger('RegDroid')
         self.enabled = True
         RegDroid.instance = self
         self.timer = None
-        
-        self.policy_name=policy_name
+
+        self.policy_name = policy_name
         self.timeout = timeout
         self.pro_click = pro_click
         self.pro_longclick = pro_longclick
@@ -65,7 +67,7 @@ class RegDroid(object):
         self.app_path = app_path
         self.is_emulator = is_emulator
         self.devices_serial = devices_serial
-        self.devices=[]
+        self.devices = []
         self.choice = choice
         self.emulator_path = emulator_path
         self.android_system = android_system
@@ -82,7 +84,6 @@ class RegDroid(object):
         self.rest_interval = rest_interval
         self.trace_path = trace_path
 
-
         if root_path is not None:
             if not os.path.isdir(root_path):
                 os.makedirs(root_path)
@@ -92,8 +93,8 @@ class RegDroid(object):
         self.root_path = root_path+self.app.package_name+"/"
         if not os.path.isdir(self.root_path):
             os.makedirs(self.root_path)
-        
-        i=0
+
+        i = 0
         for device_serial in devices_serial:
             device = Device(
                 device_serial=device_serial,
@@ -101,39 +102,38 @@ class RegDroid(object):
                 device_num=i,
                 rest_interval=rest_interval)
             self.devices.append(device)
-            i=i+1
+            i = i+1
 
         self.executor = Executor(
-                devices=self.devices,
-                app=self.app,
-                app_path=self.app_path,
-                strategy_list=self.strategy_list,
-                pro_click=self.pro_click,
-                pro_longclick=self.pro_longclick,
-                pro_scroll=self.pro_scroll,
-                pro_home=self.pro_home,
-                pro_edit=self.pro_edit,
-                pro_naturalscreen=self.pro_naturalscreen,
-                pro_leftscreen=self.pro_leftscreen,
-                pro_back=self.pro_back,
-                pro_splitscreen=self.pro_splitscreen,
-                emulator_path=self.emulator_path,
-                android_system=self.android_system,
-                root_path=self.root_path,
-                resource_path=self.resource_path,
-                testcase_count=self.testcase_count,
-                start_testcase_count=self.start_testcase_count,
-                event_num=self.event_num,
-                timeout=self.timeout,
-                policy_name=self.policy_name,
-                setting_random_denominator=self.setting_random_denominator,
-                serial_or_parallel=self.serial_or_parallel,
-                emulator_name=self.emulator_name,
-                is_login_app=self.is_login_app,
-                rest_interval=self.rest_interval,
-                trace_path=self.trace_path,
-                choice = self.choice)
-        
+            devices=self.devices,
+            app=self.app,
+            app_path=self.app_path,
+            strategy_list=self.strategy_list,
+            pro_click=self.pro_click,
+            pro_longclick=self.pro_longclick,
+            pro_scroll=self.pro_scroll,
+            pro_home=self.pro_home,
+            pro_edit=self.pro_edit,
+            pro_naturalscreen=self.pro_naturalscreen,
+            pro_leftscreen=self.pro_leftscreen,
+            pro_back=self.pro_back,
+            pro_splitscreen=self.pro_splitscreen,
+            emulator_path=self.emulator_path,
+            android_system=self.android_system,
+            root_path=self.root_path,
+            resource_path=self.resource_path,
+            testcase_count=self.testcase_count,
+            start_testcase_count=self.start_testcase_count,
+            event_num=self.event_num,
+            timeout=self.timeout,
+            policy_name=self.policy_name,
+            setting_random_denominator=self.setting_random_denominator,
+            serial_or_parallel=self.serial_or_parallel,
+            emulator_name=self.emulator_name,
+            is_login_app=self.is_login_app,
+            rest_interval=self.rest_interval,
+            trace_path=self.trace_path,
+            choice=self.choice)
 
     @staticmethod
     def get_instance():
@@ -143,22 +143,20 @@ class RegDroid(object):
         return RegDroid.instance
 
     def start(self):
-        
         """
         start interacting
         :return:
         """
-        
+
         if not self.enabled:
             return
-        # self.logger.info("Starting RegDroid")
 
         if self.timeout > 0:
             self.timer = Timer(self.timeout, self.stop)
             self.timer.start()
-        self.start = time.time()
+        self.start_time = time.time()
 
-        #connect device and install app
+        # connect device and install app
         if self.is_login_app != 0:
             self.devices[0].connect()
             self.devices[0].install_app(self.app_path[0])
@@ -166,21 +164,21 @@ class RegDroid(object):
             self.devices[1].install_app(self.app_path[1])
         else:
             for device in self.devices:
-                device.restart(self.emulator_path,self.emulator_name)
+                device.restart(self.emulator_path, self.emulator_name)
                 device.connect()
-       
-        #add some files to the devices
-        resourcelist=os.listdir(self.resource_path)
+
+        # add some files to the devices
+        resourcelist = os.listdir(self.resource_path)
         for device in self.devices:
-            device.log_crash(self.root_path+"/"+device.device_serial+"_logcat.txt")
+            device.log_crash(self.root_path+"/" +
+                             device.device_serial+"_logcat.txt")
             for resource in resourcelist:
-                device.add_file(self.resource_path,resource,"/sdcard")
+                device.add_file(self.resource_path, resource, "/sdcard")
             # if "anki" in self.app.package_name:
             #     device.mkdir("/storage/emulated/0/AnkiDroid/")
             #     device.add_file(self.resource_path,"collection.anki2","/storage/emulated/0/AnkiDroid/")
 
-        
-        if self.choice == 0: #run
+        if self.choice == 0:  # run
             if self.serial_or_parallel == 0:
                 for strategy in self.strategy_list:
                     try:
@@ -191,18 +189,18 @@ class RegDroid(object):
                 self.executor.start(0)
             utils = Utils(self.devices)
             # utils.generate_outline_html(self.app.output_path, self.strategy_list)
-        elif self.choice == 1: #replay
+        elif self.choice == 1:  # replay
             for strategy in self.strategy_list:
                 self.executor.replay(strategy)
             utils = Utils(self.devices)
             # utils.generate_replay_all_html(self.app.output_path, self.strategy_list)
-        elif self.choice == 2: #test
+        elif self.choice == 2:  # test
             self.executor.test()
-        else: #screenshot
+        else:  # screenshot
             for device in self.devices:
-                device.screenshot_and_getstate(self.root_path,7)
+                device.screenshot_and_getstate(self.root_path, 7)
 
-    def resize(self,path):
+    def resize(self, path):
         import cv2
         image = cv2.imread(path)
         (h, w) = image.shape[:2]
@@ -217,13 +215,12 @@ class RegDroid(object):
             M[0, 2] += (nW / 2) - cX
             M[1, 2] += (nH / 2) - cY
             image = cv2.warpAffine(image, M, (nW, nH))
-            image=cv2.resize(image, (256, 512))
+            image = cv2.resize(image, (256, 512))
             cv2.imwrite(path, image)
         elif w > 512:
-            image=cv2.resize(image, (256, 512))
+            image = cv2.resize(image, (256, 512))
             cv2.imwrite(path, image)
 
-    
     def stop(self):
         # for root, dirs, files in os.walk(self.root_path, topdown=False):
         #     for name in files:
@@ -231,10 +228,6 @@ class RegDroid(object):
         #             image_path=os.path.join(root, name)
         #             self.resize(image_path)
         self.enabled = False
-        end = time.time()
-        print(end-self.start)
+        print(time.time() - self.start_time)
         if self.timer and self.timer.isAlive():
             self.timer.cancel()
-        
-        
-    

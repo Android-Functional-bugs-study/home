@@ -1,30 +1,34 @@
+
 import argparse
-from regdroid import RegDroid
 import time
 import sys
+
+from regdroid import RegDroid
+
+
 def parse_args():
     """
     parse command line input
     """
     parser = argparse.ArgumentParser(description="Start RegDroid to detect regression issues.",
                                      formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("-pro_click", action="store", dest="pro_click", required=False,type=int,
+    parser.add_argument("-pro_click", action="store", dest="pro_click", required=False, type=int,
                         help="The percentage of click event", default=45)
-    parser.add_argument("-pro_longclick", action="store", dest="pro_longclick", required=False,type=int,
+    parser.add_argument("-pro_longclick", action="store", dest="pro_longclick", required=False, type=int,
                         help="The percentage of click event", default=25)
-    parser.add_argument("-pro_scroll", action="store", dest="pro_scroll", required=False,type=int,
+    parser.add_argument("-pro_scroll", action="store", dest="pro_scroll", required=False, type=int,
                         help="The percentage of click event", default=5)
-    parser.add_argument("-pro_home", action="store", dest="pro_home", required=False,type=int,
+    parser.add_argument("-pro_home", action="store", dest="pro_home", required=False, type=int,
                         help="The percentage of click event", default=0)
-    parser.add_argument("-pro_edit", action="store", dest="pro_edit", required=False,type=int,
+    parser.add_argument("-pro_edit", action="store", dest="pro_edit", required=False, type=int,
                         help="The percentage of click event", default=15)
-    parser.add_argument("-pro_naturalscreen", action="store", dest="pro_naturalscreen", required=False,type=int,
+    parser.add_argument("-pro_naturalscreen", action="store", dest="pro_naturalscreen", required=False, type=int,
                         help="The percentage of click event", default=1)
-    parser.add_argument("-pro_leftscreen", action="store", dest="pro_leftscreen", required=False,type=int,
+    parser.add_argument("-pro_leftscreen", action="store", dest="pro_leftscreen", required=False, type=int,
                         help="The percentage of click event", default=80)
     parser.add_argument("-pro_back", action="store", dest="pro_back", required=False,
-                        help="The percentage of click event", default=1,type=int)
-    parser.add_argument("-pro_splitscreen", action="store", dest="pro_splitscreen", required=False,type=int,
+                        help="The percentage of click event", default=1, type=int)
+    parser.add_argument("-pro_splitscreen", action="store", dest="pro_splitscreen", required=False, type=int,
                         help="The percentage of click event", default=0)
     parser.add_argument("-app_path", action="append", dest="app_path", required=True,
                         help="The path of the application you want to test")
@@ -34,7 +38,7 @@ def parse_args():
                         help="Serial of the device")
     parser.add_argument('-serial_or_parallel', action='store', dest="serial_or_parallel", required=False, default=0, type=int,
                         help="0 is serial, 1 is parallel")
-    parser.add_argument("-output", action="append", dest="strategy_list", required=False, 
+    parser.add_argument("-output", action="append", dest="strategy_list", required=False,
                         help="set the output directory name")
     parser.add_argument("-choice", action="store", dest="choice", required=False, default=0, type=int,
                         help="Run or replay")
@@ -73,29 +77,30 @@ def parse_args():
     # print options
     return options
 
+
 def main():
     opts = parse_args()
     print(sys.argv)
     import os
     if not os.path.exists(opts.app_path[0]):
-        print("APK %s does not exist." % (opts.app_path[0]) )
+        print(f"APK {opts.app_path[0]} does not exist.")
         return
     if not os.path.exists(opts.app_path[1]):
-        print("APK %s does not exist." % (opts.app_path[1]))
+        print(f"APK {opts.app_path[1]} does not exist.")
         return
-    
-    if len(opts.append_device)<2:
+
+    if len(opts.append_device) < 2:
         print("You need to define at least two devices")
         return
-    if len(opts.app_path)!=2:
+    if len(opts.app_path) != 2:
         print("You need to define two apps")
         return
-    
-    if  len(opts.strategy_list)+1!=len(opts.append_device) and opts.serial_or_parallel == 1:
+
+    if len(opts.strategy_list)+1 != len(opts.append_device) and opts.serial_or_parallel == 1:
         print("You need n+1 devices to execute n strategies")
         return
 
-    if len(opts.append_device)>2 and opts.serial_or_parallel ==0:
+    if len(opts.append_device) > 2 and opts.serial_or_parallel == 0:
         print("You can only execute serial strategy in 2 device")
         return
 
@@ -131,19 +136,20 @@ def main():
         rest_interval=opts.rest_interval,
         trace_path=opts.trace_path
     )
-    start_time =time.time()
+    start_time = time.time()
     regdroid.start()
     regdroid.stop()
     end_time = time.time()
     struct_time = time.gmtime(end_time-start_time)
 
     print('The program finished in{0}year{1}month{2}day{3}hours{4}minutes{5}seconds'.format(
-    struct_time.tm_year - 1970,
-    struct_time.tm_mon - 1,
-    struct_time.tm_mday - 1,
-    struct_time.tm_hour,
-    struct_time.tm_min,
-    struct_time.tm_sec))
+        struct_time.tm_year - 1970,
+        struct_time.tm_mon - 1,
+        struct_time.tm_mday - 1,
+        struct_time.tm_hour,
+        struct_time.tm_min,
+        struct_time.tm_sec))
+
 
 if __name__ == "__main__":
     main()
