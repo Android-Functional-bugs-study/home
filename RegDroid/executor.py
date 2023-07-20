@@ -575,7 +575,8 @@ class Executor(object):
 
         run_count = self.start_testcase_count
         while run_count < self.testcase_count:
-            self.restart_devices_and_install_app_and_data()
+            if run_count > 0:
+                self.restart_devices_and_install_app_and_data()
             # create folder of new run
             run_count = run_count + 1
             for device in self.guest_devices:
