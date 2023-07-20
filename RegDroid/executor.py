@@ -1,4 +1,3 @@
-
 import os
 import time
 
@@ -12,12 +11,38 @@ from utils import Utils
 
 
 class Executor(object):
-
-    def __init__(self, devices, app, app_path, strategy_list, pro_click, pro_longclick, pro_scroll,
-                 pro_home, pro_edit, pro_naturalscreen, pro_leftscreen, pro_back, pro_splitscreen, emulator_path, android_system,
-                 root_path, resource_path, testcase_count, start_testcase_count, event_num, timeout, policy_name,
-                 setting_random_denominator, serial_or_parallel, emulator_name, is_login_app, rest_interval, trace_path, choice):
-
+    def __init__(
+        self,
+        devices,
+        app,
+        app_path,
+        strategy_list,
+        pro_click,
+        pro_longclick,
+        pro_scroll,
+        pro_home,
+        pro_edit,
+        pro_naturalscreen,
+        pro_leftscreen,
+        pro_back,
+        pro_splitscreen,
+        emulator_path,
+        android_system,
+        root_path,
+        resource_path,
+        testcase_count,
+        start_testcase_count,
+        event_num,
+        timeout,
+        policy_name,
+        setting_random_denominator,
+        serial_or_parallel,
+        emulator_name,
+        is_login_app,
+        rest_interval,
+        trace_path,
+        choice,
+    ):
         self.policy_name = policy_name
         self.timeout = timeout
         self.pro_click = pro_click
@@ -51,41 +76,59 @@ class Executor(object):
         self.choice = choice
         self.deduplicate_list1 = []
         self.deduplicate_list2 = []
-        self.injector = Injector(devices=devices,
-                                 app=app,
-                                 strategy_list=strategy_list,
-                                 emulator_path=emulator_path,
-                                 android_system=android_system,
-                                 root_path=root_path,
-                                 resource_path=resource_path,
-                                 testcase_count=testcase_count,
-                                 event_num=event_num,
-                                 timeout=timeout,
-                                 setting_random_denominator=setting_random_denominator,
-                                 rest_interval=rest_interval,
-                                 choice=choice)
+        self.injector = Injector(
+            devices=devices,
+            app=app,
+            strategy_list=strategy_list,
+            emulator_path=emulator_path,
+            android_system=android_system,
+            root_path=root_path,
+            resource_path=resource_path,
+            testcase_count=testcase_count,
+            event_num=event_num,
+            timeout=timeout,
+            setting_random_denominator=setting_random_denominator,
+            rest_interval=rest_interval,
+            choice=choice,
+        )
 
-        self.checker = Checker(devices=devices,
-                               app=app,
-                               strategy_list=strategy_list,
-                               emulator_path=emulator_path,
-                               android_system=android_system,
-                               root_path=root_path,
-                               resource_path=resource_path,
-                               testcase_count=testcase_count,
-                               event_num=event_num,
-                               timeout=timeout,
-                               setting_random_denominator=setting_random_denominator,
-                               rest_interval=rest_interval,
-                               choice=self.choice)
+        self.checker = Checker(
+            devices=devices,
+            app=app,
+            strategy_list=strategy_list,
+            emulator_path=emulator_path,
+            android_system=android_system,
+            root_path=root_path,
+            resource_path=resource_path,
+            testcase_count=testcase_count,
+            event_num=event_num,
+            timeout=timeout,
+            setting_random_denominator=setting_random_denominator,
+            rest_interval=rest_interval,
+            choice=self.choice,
+        )
 
         self.utils = Utils(devices=devices)
 
     def get_policy(self):
         if self.policy_name == "random":
             print("Policy: Random")
-            policy = RandomPolicy(self.devices, self.app, self.emulator_path, self.android_system, self.root_path,
-                                  self.pro_click, self.pro_longclick, self.pro_scroll, self.pro_edit, self.pro_naturalscreen, self.pro_leftscreen, self.pro_back, self.pro_splitscreen, self.pro_home)
+            policy = RandomPolicy(
+                self.devices,
+                self.app,
+                self.emulator_path,
+                self.android_system,
+                self.root_path,
+                self.pro_click,
+                self.pro_longclick,
+                self.pro_scroll,
+                self.pro_edit,
+                self.pro_naturalscreen,
+                self.pro_leftscreen,
+                self.pro_back,
+                self.pro_splitscreen,
+                self.pro_home,
+            )
         else:
             print("No valid input policy specified. Using policy \"none\".")
             policy = None
@@ -96,9 +139,17 @@ class Executor(object):
             have_view_action = ["click", "longclick", "edit", "scroll"]
             feature = ""
             if event.action in have_view_action and event.view is not None:
-                if device.use(resourceId=event.view.resourceId).count == 0 or device.use(className=event.view.className).count == 0:
+                if (
+                    device.use(resourceId=event.view.resourceId).count == 0
+                    or device.use(className=event.view.className).count == 0
+                ):
                     lines = device.use.dump_hierarchy()
-                    if (event.view.resourceId != "" and event.view.resourceId not in lines) or (event.view.className != "" and event.view.className not in lines):
+                    if (
+                        event.view.resourceId != ""
+                        and event.view.resourceId not in lines
+                    ) or (
+                        event.view.className != "" and event.view.className not in lines
+                    ):
                         return False
 
             if event.action.startswith("setting_"):
@@ -132,8 +183,8 @@ class Executor(object):
             else:
                 self.injector.replay_setting(event, self.strategy_list)
 
-            print(device.device_serial+":"+feature+":end execute\n")
-            time.sleep(self.rest_interval*1)
+            print(device.device_serial + ":" + feature + ":end execute\n")
+            time.sleep(self.rest_interval * 1)
             return True
         except Exception as ex:
             if num == 0:
@@ -144,7 +195,6 @@ class Executor(object):
                 return False
 
     def replay(self, strategy):
-
         # init
         self.injector.init_setting()
         action_list = ["click", "long_click", "edit"]
@@ -152,31 +202,33 @@ class Executor(object):
         path = os.path.join(self.root_path, f"strategy_{strategy}")
         self.error_path = os.path.join(path, "error_replay")
         self.utils.create_dir(self.error_path)
-        self.f_replay_record = open(os.path.join(
-            path, "error_replay.txt"), 'w', encoding='utf-8')
+        self.f_replay_record = open(
+            os.path.join(path, "error_replay.txt"), 'w', encoding='utf-8'
+        )
         self.error_event_lists = []
         if not os.path.exists(os.path.join(path, "error_realtime.txt")):
             print("You should run first before replaying!")
             return
-        self.f_replay = open(os.path.join(
-            path, "error_realtime.txt"), 'r', encoding='utf-8')
+        self.f_replay = open(
+            os.path.join(path, "error_realtime.txt"), 'r', encoding='utf-8'
+        )
         lines = self.f_replay.readlines()
 
         for line in lines:
-
             self.error_event_lists.append(line)
             if "Start::" in line:
                 # init dir for each error
                 print("Start")
                 record_flag = False
                 linelist = line.split("::")
-                self.utils.create_dir(os.path.join(
-                    self.error_path, linelist[1]))
-                self.screen_path = os.path.join(
-                    self.error_path, linelist[1], "screen/")
+                self.utils.create_dir(os.path.join(self.error_path, linelist[1]))
+                self.screen_path = os.path.join(self.error_path, linelist[1], "screen/")
                 self.utils.create_dir(self.screen_path)
-                f_read_trace = open(os.path.join(
-                    self.error_path, linelist[1], "read_trace.txt"), 'w', encoding='utf-8')
+                f_read_trace = open(
+                    os.path.join(self.error_path, linelist[1], "read_trace.txt"),
+                    'w',
+                    encoding='utf-8',
+                )
                 print(self.screen_path)
             elif "End::" in line:
                 # end
@@ -187,10 +239,13 @@ class Executor(object):
                     self.error_event_lists = []
                     record_flag = False
                     f_read_trace.close()
-                    self.utils.generate_html(os.path.join(self.error_path, linelist[1]), os.path.join(
-                        self.error_path, linelist[1]), linelist[1])
+                    self.utils.generate_html(
+                        os.path.join(self.error_path, linelist[1]),
+                        os.path.join(self.error_path, linelist[1]),
+                        linelist[1],
+                    )
             elif line.strip() != "":
-                print("-----------------------"+'\n'+line)
+                print("-----------------------" + '\n' + line)
                 f_read_trace.write(line)
                 f_read_trace.flush()
                 # replay each event
@@ -205,13 +260,18 @@ class Executor(object):
                 event.print_event()
                 if elementlist[1] == "save_state":
                     self.save_state(
-                        event.device.device_num, self.screen_path, elementlist[0], self.f_replay_record)
+                        event.device.device_num,
+                        self.screen_path,
+                        elementlist[0],
+                        self.f_replay_record,
+                    )
                 else:
                     if event.action in action_list:
                         self.utils.draw_event(event)
                     args = (event.device, event, 0)
                     self.devices[event.device.device_num].set_thread(
-                        self.execute_event, args)
+                        self.execute_event, args
+                    )
                     if event.device.device_num == 1:
                         self.utils.start_thread()
                         for device in self.devices:
@@ -223,11 +283,16 @@ class Executor(object):
                                     self.utils.draw_event(event)
                                     self.utils.draw_error_frame()
                                 device.set_thread(None, None)
-                    time.sleep(self.rest_interval*1)
-                if "device1" in line and "save_state" in line and self.devices[0].state is not None and self.devices[1].state is not None and not self.devices[0].state.same(self.devices[1].state):
+                    time.sleep(self.rest_interval * 1)
+                if (
+                    "device1" in line
+                    and "save_state" in line
+                    and self.devices[0].state is not None
+                    and self.devices[1].state is not None
+                    and not self.devices[0].state.same(self.devices[1].state)
+                ):
                     print("different!")
-                    event = Event(
-                        None, "wrong", self.devices[1], elementlist[0])
+                    event = Event(None, "wrong", self.devices[1], elementlist[0])
                     self.utils.draw_event(event)
                 if "::start::" in line:
                     self.checker.check_start(0, strategy)
@@ -237,11 +302,9 @@ class Executor(object):
         if elementlist[4].strip() != "None":
             view = View(elementlist[4], None, [])
         if elementlist[2] == "device0":
-            event = Event(view, elementlist[1],
-                          self.devices[0], elementlist[0])
+            event = Event(view, elementlist[1], self.devices[0], elementlist[0])
         elif elementlist[2] == "device1":
-            event = Event(view, elementlist[1],
-                          self.devices[1], elementlist[0])
+            event = Event(view, elementlist[1], self.devices[1], elementlist[0])
         else:
             print(f"{line} error")
         return event
@@ -254,7 +317,12 @@ class Executor(object):
 
         for device in self.guest_devices:
             self.utils.write_read_event(
-                "::start::all devices::None::None"+'\n', event_count, None, "all devices", device.device_num)
+                "::start::all devices::None::None" + '\n',
+                event_count,
+                None,
+                "all devices",
+                device.device_num,
+            )
             event = Event(None, "start", device, event_count)
             self.utils.write_event(event, device.device_num, device.f_trace)
             self.utils.draw_event(event)
@@ -269,7 +337,12 @@ class Executor(object):
             device.wrong_event_lists.clear()
             device.wrong_flag = True
             self.utils.write_read_event(
-                "::clear::all devices::None::None"+'\n', event_count, None, "all devices", device.device_num)
+                "::clear::all devices::None::None" + '\n',
+                event_count,
+                None,
+                "all devices",
+                device.device_num,
+            )
             event = Event(None, "clear", device, event_count)
             self.utils.write_event(event, device.device_num, device.f_trace)
             self.utils.draw_event(event)
@@ -285,8 +358,7 @@ class Executor(object):
             event = Event(None, "naturalscreen", device, event_count)
             self.utils.write_event(event, device.device_num, device.f_trace)
             event = Event(None, "clear", device, event_count)
-            event_count = self.write_draw_and_save_all(
-                device, event, event_count)
+            event_count = self.write_draw_and_save_all(device, event, event_count)
 
         # if event_count>3:
         #     event=self.injector.change_setting_after_run(event_count,strategy)
@@ -304,8 +376,7 @@ class Executor(object):
 
         for device in self.guest_devices:
             event = Event(None, "start", device, event_count)
-            event_count = self.write_draw_and_save_all(
-                device, event, event_count)
+            event_count = self.write_draw_and_save_all(device, event, event_count)
 
         event = self.injector.change_setting_before_run(event_count, strategy)
 
@@ -317,7 +388,7 @@ class Executor(object):
         for device in self.devices:
             device.use.press("back")
         print("Back")
-        time.sleep(self.rest_interval*1)
+        time.sleep(self.rest_interval * 1)
         if not self.checker.check_foreground():
             for device in self.devices:
                 device.stop_app(self.app)
@@ -328,40 +399,47 @@ class Executor(object):
 
             for device in self.guest_devices:
                 self.utils.write_read_event(
-                    "::restart::all devices::None::None"+'\n', event_count, None, "all devices", device.device_num)
+                    "::restart::all devices::None::None" + '\n',
+                    event_count,
+                    None,
+                    "all devices",
+                    device.device_num,
+                )
                 event = Event(None, "back", device, event_count)
-                self.utils.write_event(
-                    event, device.device_num, device.f_trace)
+                self.utils.write_event(event, device.device_num, device.f_trace)
                 event = Event(None, "home", device, event_count)
-                self.utils.write_event(
-                    event, device.device_num, device.f_trace)
+                self.utils.write_event(event, device.device_num, device.f_trace)
                 event = Event(None, "start", device, event_count)
-                self.utils.write_event(
-                    event, device.device_num, device.f_trace)
+                self.utils.write_event(event, device.device_num, device.f_trace)
                 self.utils.draw_event(event)
         else:
             for device in self.guest_devices:
                 self.utils.write_read_event(
-                    "::back::all devices::None::None"+'\n', event_count, None, "all devices", device.device_num)
+                    "::back::all devices::None::None" + '\n',
+                    event_count,
+                    None,
+                    "all devices",
+                    device.device_num,
+                )
                 event = Event(None, "back", device, event_count)
-                self.utils.write_event(
-                    event, device.device_num, device.f_trace)
+                self.utils.write_event(event, device.device_num, device.f_trace)
                 self.utils.draw_event(event)
 
     def save_all_state(self, event_count):
-        time.sleep(self.rest_interval*1)
+        time.sleep(self.rest_interval * 1)
         for device in self.guest_devices:
             self.save_state(0, f"{device.path}screen/", event_count, device.f_trace)
-            self.save_state(device.device_num, device.path +
-                            "screen/", event_count, device.f_trace)
+            self.save_state(
+                device.device_num, device.path + "screen/", event_count, device.f_trace
+            )
             event = Event(None, "save_state", device, event_count)
             event.set_count(device.device_num)
             self.utils.write_event(event, device.device_num, device.f_trace)
-        return event_count+1
+        return event_count + 1
 
     def update_all_state(self, event_count):
-        time.sleep(self.rest_interval*1)
-        event_count = event_count-1
+        time.sleep(self.rest_interval * 1)
+        event_count = event_count - 1
         for device in self.guest_devices:
             self.update_state(0, f"{device.path}screen/", event_count, device.f_trace)
             self.update_state(
@@ -370,12 +448,11 @@ class Executor(object):
                 event_count,
                 device.f_trace,
             )
-        event_count = event_count+1
+        event_count = event_count + 1
 
     def save_state(self, device_count, path, event_count, f_trace):
         # get and save state of all devices
-        lines = self.devices[device_count].screenshot_and_getstate(
-            path, event_count)
+        lines = self.devices[device_count].screenshot_and_getstate(path, event_count)
         state = State(lines)
         self.devices[device_count].update_state(state)
 
@@ -405,25 +482,29 @@ class Executor(object):
         try:
             wait_time = self.checker.check_loading()
             if wait_time > 0:
-                event_count = event_count-1
+                event_count = event_count - 1
                 event_count = self.save_all_state(event_count)
         except Exception:
             import traceback
+
             traceback.print_exc()
             self.restart_devices()
 
     def write_draw_and_save_one(self, event, event_count):
         self.utils.write_read_event(
-            None, event_count, event, "all device", event.device.device_num)
+            None, event_count, event, "all device", event.device.device_num
+        )
         self.utils.write_one_device_event(
-            event, event.device.device_num, event.device.f_trace)
+            event, event.device.device_num, event.device.f_trace
+        )
         self.utils.draw_event(event)
         event_count = self.save_all_state(event_count)
         return event_count
 
     def write_draw_and_save_all(self, device, event, event_count):
         self.utils.write_read_event(
-            None, event_count, event, "all device", event.device.device_num)
+            None, event_count, event, "all device", event.device.device_num
+        )
         self.utils.write_event(event, device.device_num, device.f_trace)
         self.utils.draw_event(event)
         event_count = self.save_all_state(event_count)
@@ -441,7 +522,7 @@ class Executor(object):
 
     def test(self):
         for device in self.guest_devices:
-            self.checker.check_language(self.root_path+"/strategy_language/")
+            self.checker.check_language(self.root_path + "/strategy_language/")
 
     def checkduplicate(self):
         for screen in self.deduplicate_list1:
@@ -470,6 +551,7 @@ class Executor(object):
             # add some files to the devices
         resourcelist = os.listdir(self.resource_path)
         for device in self.devices:
+            device.disable_keyboard()
             device.log_crash(f"{self.root_path}/{device.device_serial}_logcat.txt")
             for resource in resourcelist:
                 device.add_file(self.resource_path, resource, "/sdcard")
@@ -488,14 +570,14 @@ class Executor(object):
             self.devices[1].make_strategy(self.root_path)
         else:
             for device in self.guest_devices:
-                device.set_strategy(self.strategy_list[device.device_num-1])
+                device.set_strategy(self.strategy_list[device.device_num - 1])
                 device.make_strategy(self.root_path)
 
         run_count = self.start_testcase_count
         while run_count < self.testcase_count:
             self.restart_devices_and_install_app_and_data()
             # create folder of new run
-            run_count = run_count+1
+            run_count = run_count + 1
             for device in self.guest_devices:
                 device.use.press("back")
                 device.use.press("back")
@@ -510,7 +592,6 @@ class Executor(object):
             event_count = self.clear_and_restart_app(event_count, strategy)
 
             while event_count < self.event_num:
-
                 # if the state of any device is different from last state, stoat need to judge (loading, foreground, same) again
                 change_flag = False
                 self.update_all_state(event_count)
@@ -546,10 +627,14 @@ class Executor(object):
                         # elif self.devices[1].wrong_flag==True:
                         print("Write wrong!")
                         self.utils.write_error(
-                            1, run_count, self.devices[1].wrong_event_lists, self.devices[1].f_wrong, self.devices[1].wrong_num)
-                        self.devices[1].wrong_num = self.devices[1].wrong_num+1
-                        event = Event(
-                            None, "wrong", self.devices[1], event_count)
+                            1,
+                            run_count,
+                            self.devices[1].wrong_event_lists,
+                            self.devices[1].f_wrong,
+                            self.devices[1].wrong_num,
+                        )
+                        self.devices[1].wrong_num = self.devices[1].wrong_num + 1
+                        event = Event(None, "wrong", self.devices[1], event_count)
                         self.utils.draw_event(event)
 
                     # check keyboard
@@ -584,27 +669,35 @@ class Executor(object):
                 elif not success:
                     self.utils.print_dividing_line(False, event_count)
                     self.utils.write_read_event(
-                        None, event_count, event, "different", fail_device)
+                        None, event_count, event, "different", fail_device
+                    )
                     self.utils.write_event(
-                        event, fail_device, self.devices[fail_device].f_trace)
+                        event, fail_device, self.devices[fail_device].f_trace
+                    )
                     self.utils.draw_event(event)
                     if not self.checkduplicate():
                         print("write error")
                         self.utils.draw_error_frame()
                         self.utils.write_error(
-                            fail_device, run_count, self.devices[fail_device].error_event_lists, self.devices[fail_device].f_error, self.devices[fail_device].error_num)
-                        self.devices[fail_device].error_num = self.devices[fail_device].error_num+1
+                            fail_device,
+                            run_count,
+                            self.devices[fail_device].error_event_lists,
+                            self.devices[fail_device].f_error,
+                            self.devices[fail_device].error_num,
+                        )
+                        self.devices[fail_device].error_num = (
+                            self.devices[fail_device].error_num + 1
+                        )
                     event_count = self.save_all_state(event_count)
-                    event_count = self.clear_and_restart_app(
-                        event_count, strategy)
+                    event_count = self.clear_and_restart_app(event_count, strategy)
                     continue
                 # all devices execute success, record event and update state
                 else:
                     self.utils.print_dividing_line(True, event_count)
                     self.utils.write_read_event(
-                        None, event_count, event, "all device", device.device_num)
-                    self.utils.write_event(
-                        event, device.device_num, device.f_trace)
+                        None, event_count, event, "all device", device.device_num
+                    )
+                    self.utils.write_event(event, device.device_num, device.f_trace)
                     event_count = self.save_all_state(event_count)
 
                 self.checker.check_keyboard()

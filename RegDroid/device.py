@@ -1,4 +1,3 @@
-
 import os
 import subprocess
 import time
@@ -28,7 +27,9 @@ class Device(object):
     Record the information of the device
     """
 
-    def __init__(self, device_num=None, device_serial=None, is_emulator=True, rest_interval=None):
+    def __init__(
+        self, device_num=None, device_serial=None, is_emulator=True, rest_interval=None
+    ):
         self.device_num = device_num
         self.device_serial = device_serial
         self.is_emulator = is_emulator
@@ -64,15 +65,17 @@ class Device(object):
     def restart(self, emulator_path, emulator_name):
         port = self.device_serial[self.device_serial.find("-") + 1 :]
         print(f"----{port}")
-        subprocess.run(["adb", "-s", self.device_serial,
-                       "emu", "kill"], stdout=subprocess.PIPE)
-        time.sleep(self.rest_interval*20)
+        subprocess.run(
+            ["adb", "-s", self.device_serial, "emu", "kill"], stdout=subprocess.PIPE
+        )
+        time.sleep(self.rest_interval * 20)
         os.popen(f"{emulator_path} -avd {emulator_name} -read-only -port {port}")
         print("wait-for-device")
-        subprocess.run(["adb", "-s", self.device_serial,
-                       "wait-for-device"], stdout=subprocess.PIPE)
+        subprocess.run(
+            ["adb", "-s", self.device_serial, "wait-for-device"], stdout=subprocess.PIPE
+        )
         print("wait-for-device end")
-        time.sleep(self.rest_interval*10)
+        time.sleep(self.rest_interval * 10)
 
     def make_strategy(self, root_path):
         if not os.path.isdir(f"{root_path}strategy_{self.strategy}/"):
@@ -107,8 +110,9 @@ class Device(object):
 
     def install_app(self, app):
         print(app)
-        subprocess.run(["adb", "-s", self.device_serial,
-                       "install", app], stdout=subprocess.PIPE)
+        subprocess.run(
+            ["adb", "-s", self.device_serial, "install", app], stdout=subprocess.PIPE
+        )
 
     def initialization(self):
         self.use.set_orientation("n")
@@ -117,16 +121,22 @@ class Device(object):
         print("initial setting")
 
     def screenshot_and_getstate(self, path, event_count):
-        self.screenshot_path = path + \
-                str(event_count)+'_'+self.device_serial+'.png'
-        self.use.screenshot(path+str(event_count)+'_' +
-                            self.device_serial+'.png')
+        self.screenshot_path = (
+            path + str(event_count) + '_' + self.device_serial + '.png'
+        )
+        self.use.screenshot(path + str(event_count) + '_' + self.device_serial + '.png')
         xml = self.use.dump_hierarchy()
-        f = open(path+str(event_count)+'_'+self.device_serial +
-                 '.xml', 'w', encoding='utf-8')
+        f = open(
+            path + str(event_count) + '_' + self.device_serial + '.xml',
+            'w',
+            encoding='utf-8',
+        )
         f.write(xml)
-        with open(path+str(event_count)+'_'+self.device_serial +
-                 '.xml', 'r', encoding='utf-8') as f:
+        with open(
+            path + str(event_count) + '_' + self.device_serial + '.xml',
+            'r',
+            encoding='utf-8',
+        ) as f:
             lines = f.readlines()
         return lines
 
@@ -165,22 +175,29 @@ class Device(object):
         try:
             if self.strategy != "language":
                 if view.description != "":
-                    self.use(description=view.description,
-                             packageName=view.package).click()
+                    self.use(
+                        description=view.description, packageName=view.package
+                    ).click()
                     return "description"
                 elif view.text != "":
                     self.use(text=view.text, packageName=view.package).click()
                     return "text"
                 elif view.instance == 0:
-                    self.use(className=view.className, resourceId=view.resourceId,
-                             packageName=view.package).click()
+                    self.use(
+                        className=view.className,
+                        resourceId=view.resourceId,
+                        packageName=view.package,
+                    ).click()
                     return "classNameresourceId"
                 else:
                     self.use.click(view.x, view.y)
                     return "xy"
             elif view.instance == 0:
-                self.use(className=view.className, resourceId=view.resourceId,
-                         packageName=view.package).click()
+                self.use(
+                    className=view.className,
+                    resourceId=view.resourceId,
+                    packageName=view.package,
+                ).click()
                 return "classNameresourceId"
             else:
                 self.use.click(view.x, view.y)
@@ -195,12 +212,14 @@ class Device(object):
                 self.use(text=view.text, packageName=view.package).click()
                 return "text"
             if view.description != "":
-                self.use(description=view.description,
-                         packageName=view.package).click()
+                self.use(description=view.description, packageName=view.package).click()
                 return "description"
             elif view.instance == 0:
-                self.use(className=view.className, resourceId=view.resourceId,
-                         packageName=view.package).click()
+                self.use(
+                    className=view.className,
+                    resourceId=view.resourceId,
+                    packageName=view.package,
+                ).click()
                 return "classNameresourceId"
             else:
                 self.use.click(view.x, view.y)
@@ -213,21 +232,29 @@ class Device(object):
         try:
             if self.strategy != "language":
                 if view.description != "":
-                    self.use(description=view.description,
-                             packageName=view.package).long_click(duration=1.0)
+                    self.use(
+                        description=view.description, packageName=view.package
+                    ).long_click(duration=1.0)
                     return
                 elif view.text != "":
                     self.use(text=view.text, packageName=view.package).long_click(
-                        duration=1.0)
+                        duration=1.0
+                    )
                     return
                 elif view.instance == 0:
-                    self.use(className=view.className, resourceId=view.resourceId,
-                             packageName=view.package).long_click(duration=1.0)
+                    self.use(
+                        className=view.className,
+                        resourceId=view.resourceId,
+                        packageName=view.package,
+                    ).long_click(duration=1.0)
                 else:
                     self.use.long_click(view.x, view.y, duration=1.0)
             elif view.instance == 0:
-                self.use(className=view.className, resourceId=view.resourceId,
-                         packageName=view.package).long_click(duration=1.0)
+                self.use(
+                    className=view.className,
+                    resourceId=view.resourceId,
+                    packageName=view.package,
+                ).long_click(duration=1.0)
             else:
                 self.use.long_click(view.x, view.y, duration=1.0)
         except:
@@ -237,33 +264,54 @@ class Device(object):
 
     def edit(self, view, strategy_list, text):
         if "language" not in strategy_list:
-            self.use(className=view.className, resourceId=view.resourceId,
-                     packageName=view.package).set_text(text)
+            self.use(
+                className=view.className,
+                resourceId=view.resourceId,
+                packageName=view.package,
+            ).set_text(text)
         else:
-            self.use(className=view.className, resourceId=view.resourceId,
-                     packageName=view.package).set_text(text)
+            self.use(
+                className=view.className,
+                resourceId=view.resourceId,
+                packageName=view.package,
+            ).set_text(text)
 
     def scroll(self, view, strategy_list):
         if view.action == "scroll_backward":
-            self.use(className=view.className, resourceId=view.resourceId,
-                     packageName=view.package).scroll.vert.backward(steps=100)
+            self.use(
+                className=view.className,
+                resourceId=view.resourceId,
+                packageName=view.package,
+            ).scroll.vert.backward(steps=100)
         elif view.action == "scroll_forward":
-            self.use(className=view.className, resourceId=view.resourceId,
-                     packageName=view.package).scroll.vert.forward(steps=100)
+            self.use(
+                className=view.className,
+                resourceId=view.resourceId,
+                packageName=view.package,
+            ).scroll.vert.forward(steps=100)
         elif view.action == "scroll_right":
-            self.use(className=view.className, resourceId=view.resourceId,
-                     packageName=view.package).scroll.horiz.toEnd(max_swipes=10)
+            self.use(
+                className=view.className,
+                resourceId=view.resourceId,
+                packageName=view.package,
+            ).scroll.horiz.toEnd(max_swipes=10)
         elif view.action == "scroll_left":
-            self.use(className=view.className, resourceId=view.resourceId,
-                     packageName=view.package).scroll.horiz.toBeginning(max_swipes=10)
+            self.use(
+                className=view.className,
+                resourceId=view.resourceId,
+                packageName=view.package,
+            ).scroll.horiz.toBeginning(max_swipes=10)
 
     def close_keyboard(self):
-        subprocess.run(["adb", "-s", self.device_serial, "shell",
-                       "input", "keyevent", "111"], stdout=subprocess.PIPE)
+        subprocess.run(
+            ["adb", "-s", self.device_serial, "shell", "input", "keyevent", "111"],
+            stdout=subprocess.PIPE,
+        )
 
     def add_file(self, resource_path, resource, path):
-        subprocess.run(["adb", "-s", self.device_serial,
-                       "logcat", "-c"], stdout=subprocess.PIPE)
+        subprocess.run(
+            ["adb", "-s", self.device_serial, "logcat", "-c"], stdout=subprocess.PIPE
+        )
         subprocess.run(
             [
                 "adb",
@@ -280,5 +328,10 @@ class Device(object):
         os.popen(f"adb -s {self.device_serial} logcat -b crash >{path}")
 
     def mkdir(self, path):
-        subprocess.run(["adb", "-s", self.device_serial, "shell",
-                       "mkdir", path], stdout=subprocess.PIPE)
+        subprocess.run(
+            ["adb", "-s", self.device_serial, "shell", "mkdir", path],
+            stdout=subprocess.PIPE,
+        )
+
+    def disable_keyboard(self):
+        self.use.set_fastinput_ime(True)
