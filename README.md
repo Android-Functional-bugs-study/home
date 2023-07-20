@@ -1,5 +1,5 @@
 # Publication
-----------------------------------------------------------------
+
 [1] "An Empirical Study of Functional Bugs in Android Apps" by Yiheng Xiong, Mengqian Xu, Ting Su, Jingling Sun, Jue Wang, He Wen, Geguang Pu, Jifeng He and Zhendong Su. In Proceedings of the 32nd ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA 2023).
 ```
 @inproceedings{functionalbugs2023,
