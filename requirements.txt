@@ -1,0 +1,5 @@
+uiautomator2==2.16.23
+numpy
+opencv-python
+androguard==3.3.5
+langid==1.1.6
