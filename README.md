@@ -13,6 +13,8 @@
 }
 ```
 
+*You can find more about our work on testing/analyzing Android apps at this [website](https://tingsu.github.io/files/mobile-app-analysis.html)*.
+
 # Replication Package
 This repository contains all the artifacts (including the dataset and the tool Regdroid) in our study.
 
